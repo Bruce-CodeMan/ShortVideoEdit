@@ -4,65 +4,73 @@
  * @Description: 
  */
 import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/react/20/solid"
+import { useEffect, useState } from "react"
 
-function App() {
+interface IMessage {
+  title: string;
+}
 
-  const data = [
-    {
-      key: "1",
-      name: "Bruce"
-    },
-    {
-      key: "2",
-      name: "Lee"
-    },
-    {
-      key: "3",
-      name: "xxx"
-    },
-    {
-      key: "4",
-      name: "yyy"
-    },
-    {
-      key: "5",
-      name: "zzz"
-    },
-    {
-      key: "6",
-      name: "b"
-    },
-    {
-      key: "7",
-      name: "a"
-    },
-    {
-      key: "8",
-      name: "7"
-    },
-    {
-      key: "9",
-      name: "0"
+const App = () => {
+
+  const [socket, setSocket] = useState<WebSocket | null>(null)
+  const [messages, setMessages] = useState<IMessage[]>([])
+
+  useEffect(() => {
+    const newSocket = new WebSocket("ws://localhost:8765")
+
+    newSocket.onopen = () => {
+      console.log("Socket opened!")
     }
-  ]
+
+    newSocket.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      
+      setMessages(prevMessages => {
+        return [...prevMessages, data]
+      })
+    }
+
+    newSocket.onclose = () => {
+      console.log("Socket Closed!")
+    }
+
+    setSocket(newSocket)
+
+    return () => {
+      newSocket.close()
+    }
+
+  }, [])
+
+  const generateVideoHandler = () => {
+    console.log("开始制作视频")
+    socket?.send(JSON.stringify({
+      "action": "start"
+    }))
+  }
 
   return (
     <div className="bg-gradient-to-br from-blue-300 via-purple-200 to-pink-300 flex flex-col min-h-screen"> 
       <div className="h-3/10 min-h-[300px] w-full flex items-center justify-center">
-        <button className="bg-white p-4 rounded-lg text-4xl tracking-widest">AI一键生成视频</button>
+        <button 
+          onClick={generateVideoHandler}
+          className="bg-white p-4 rounded-lg text-4xl tracking-widest"
+        >AI一键生成视频</button>
       </div>
       <div className="flex-grow w-full flex flex-col items-center">
         <div className="grid grid-cols-4 gap-4 mx-auto">
           {
-            data.map((item) => (
+            messages.map((item) => (
               <div 
                 className="flex w-64 h-32 bg-white justify-center items-center rounded-lg"
-                key={item.key}
-              ></div>
+                key={item.title}
+              >
+                <p className="text-3xl text-red-300">{ item.title }</p>
+              </div>
             ))
           }
         </div>
-        { data.length > 12 && (
+        { messages.length > 12 && (
           <div className="mt-12 w-[80%] flex items-center justify-between border-t border-gray-600 px-4 sm:px-6">
           {/* Left Arrow - Start */}
           <div className="-mt-px flex w-0 flex-1">
