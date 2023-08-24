@@ -17,3 +17,11 @@ export interface IPages {
   currentPage: number;
   showNext: boolean;
 }
+
+// 下拉框
+export interface IListSelect {
+  selected: any;
+  setSelected: (value: any) => void;
+  label: string;
+  data: {id: number, name: string}[];
+}

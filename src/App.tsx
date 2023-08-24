@@ -85,9 +85,8 @@ const App = () => {
     <div className="bg-gradient-to-br from-blue-300 via-purple-200 to-pink-300 flex flex-col min-h-screen"> 
       <div className="h-3/10 min-h-[300px] w-full flex flex-col items-center">
         <div className="flex items-center justify-center gap-8 mt-4 w-full">
-          <ListSelect />
-          <ListSelect />
-          <ListSelect />
+          <ListSelect selected={size} setSelected={setSize} data={SIZE} label="尺寸"/>
+          <ListSelect selected={resolution} setSelected={setResolution} data={RESOLUTION} label="分辨率"/>
         </div>
         <button 
           onClick={generateVideoHandler}
