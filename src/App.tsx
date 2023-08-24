@@ -3,17 +3,29 @@
  * @Author: Bruce Hsu
  * @Description: 
  */
-import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/react/20/solid"
 import { useEffect, useState } from "react"
 
-interface IMessage {
-  title: string;
-}
+// Custom Imports
+import { PAGE_SIZE } from "./utils/constants";
+import { IMessage } from "./utils/types";
+import Pages from "./components/Pages";
+
 
 const App = () => {
 
+
   const [socket, setSocket] = useState<WebSocket | null>(null)
   const [messages, setMessages] = useState<IMessage[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isClick, setIsClick] = useState(true)
+
+
+  // 计算分页数据
+  const pages = Math.ceil(messages.length / PAGE_SIZE)
+  const currentMessages = messages.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  )
 
   useEffect(() => {
     const newSocket = new WebSocket("ws://localhost:8765")
@@ -24,6 +36,8 @@ const App = () => {
 
     newSocket.onmessage = (event) => {
       const data = JSON.parse(event.data)
+
+      
       
       setMessages(prevMessages => {
         return [...prevMessages, data]
@@ -42,106 +56,53 @@ const App = () => {
 
   }, [])
 
+  useEffect(() => {
+    if(pages !== currentPage){
+      setCurrentPage(pages)
+    }
+  }, [messages])
+
   const generateVideoHandler = () => {
-    console.log("开始制作视频")
+    setIsClick(false)
     socket?.send(JSON.stringify({
       "action": "start"
     }))
   }
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  // 是否显示分页的箭头，左右
+  const showPrevious = currentPage !== 1
+  const showNext = currentPage !== pages
 
   return (
     <div className="bg-gradient-to-br from-blue-300 via-purple-200 to-pink-300 flex flex-col min-h-screen"> 
       <div className="h-3/10 min-h-[300px] w-full flex items-center justify-center">
         <button 
           onClick={generateVideoHandler}
-          className="bg-white p-4 rounded-lg text-4xl tracking-widest"
-        >AI一键生成视频</button>
+          className={` p-4 rounded-lg text-4xl tracking-widest ${isClick ? 'bg-white' : 'bg-gray-400'}`}
+          disabled={!isClick}
+        >{ isClick? 'AI一键生成视频' : '正在生成视频中'}</button>
       </div>
       <div className="flex-grow w-full flex flex-col items-center">
-        <div className="grid grid-cols-4 gap-4 mx-auto">
+        <div className="grid grid-cols-4 gap-8 mx-auto">
           {
-            messages.map((item) => (
+            currentMessages.map((item) => (
               <div 
-                className="flex w-64 h-32 bg-white justify-center items-center rounded-lg"
+                className="flex w-64 h-32 justify-center items-center rounded-lg"
                 key={item.title}
               >
-                <p className="text-3xl text-red-300">{ item.title }</p>
+                <video controls className="rounded-lg">
+                  <source src="https://fitness-nestjs.oss-cn-shanghai.aliyuncs.com/videos/458_1692544695.mp4" type="video/mp4"/>
+                </video>
               </div>
             ))
           }
         </div>
-        { messages.length > 12 && (
-          <div className="mt-12 w-[80%] flex items-center justify-between border-t border-gray-600 px-4 sm:px-6">
-          {/* Left Arrow - Start */}
-          <div className="-mt-px flex w-0 flex-1">
-            <a
-              href="#"
-              className="inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            >
-              <ArrowLongLeftIcon className="mr-3 h-5 w-5 text-gray-400" aria-hidden="true" />
-              Previous
-            </a>
-          </div>
-          {/* Left Arrow - End */}
-
-          {/* Middle Pages - Start */}
-          <div className="hidden md:-mt-px md:flex">
-            <a
-              href="#"
-              className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            >
-              1
-            </a>
-            {/* Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" */}
-            <a
-              href="#"
-              className="inline-flex items-center border-t-2 border-indigo-500 px-4 pt-4 text-sm font-medium text-indigo-600"
-              aria-current="page"
-            >
-              2
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            >
-              3
-            </a>
-            <span className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500">
-              ...
-            </span>
-            <a
-              href="#"
-              className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            >
-              8
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            >
-              9
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            >
-              10
-            </a>
-          </div>
-          {/* Middle Pages - End */}
-
-          {/* Right Arrow - Start */}
-          <div className="-mt-px flex w-0 flex-1 justify-end">
-            <a
-              href="#"
-              className="inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            >
-              Next
-              <ArrowLongRightIcon className="ml-3 h-5 w-5 text-gray-400" aria-hidden="true" />
-            </a>
-          </div>
-          {/* Right Arrow - End */}
-          </div>
+        { messages.length > PAGE_SIZE && (
+          <Pages goToPage={goToPage} showNext={showNext} showPrevious={showPrevious} pages={pages} currentPage={currentPage}/>
         ) }
       </div>
       
