@@ -6,18 +6,22 @@
 import { useEffect, useState } from "react"
 
 // Custom Imports
-import { PAGE_SIZE } from "./utils/constants";
+import { PAGE_SIZE, RESOLUTION, SIZE } from "./utils/constants";
 import { IMessage } from "./utils/types";
 import Pages from "./components/Pages";
+import ListSelect from "./components/ListBox";
 
 
 const App = () => {
-
 
   const [socket, setSocket] = useState<WebSocket | null>(null)
   const [messages, setMessages] = useState<IMessage[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [isClick, setIsClick] = useState(true)
+  // 画面的尺寸
+  const [size, setSize] = useState(SIZE[0])
+  // 画面的分辨率
+  const [resolution, setResolution] = useState(RESOLUTION[0])
 
 
   // 计算分页数据
@@ -79,10 +83,15 @@ const App = () => {
 
   return (
     <div className="bg-gradient-to-br from-blue-300 via-purple-200 to-pink-300 flex flex-col min-h-screen"> 
-      <div className="h-3/10 min-h-[300px] w-full flex items-center justify-center">
+      <div className="h-3/10 min-h-[300px] w-full flex flex-col items-center">
+        <div className="flex items-center justify-center gap-8 mt-4 w-full">
+          <ListSelect />
+          <ListSelect />
+          <ListSelect />
+        </div>
         <button 
           onClick={generateVideoHandler}
-          className={` p-4 rounded-lg text-4xl tracking-widest ${isClick ? 'bg-white' : 'bg-gray-400'}`}
+          className={` p-4 rounded-lg text-4xl tracking-widest mt-4 ${isClick ? 'bg-white' : 'bg-gray-400'}`}
           disabled={!isClick}
         >{ isClick? 'AI一键生成视频' : '正在生成视频中'}</button>
       </div>
