@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react"
 
 // Custom Imports
-import { PAGE_SIZE, RESOLUTION, SIZE } from "./utils/constants";
+import { COUNT, PAGE_SIZE, RESOLUTION, SIZE } from "./utils/constants";
 import { IMessage } from "./utils/types";
 import Pages from "./components/Pages";
 import ListSelect from "./components/ListBox";
@@ -22,6 +22,8 @@ const App = () => {
   const [size, setSize] = useState(SIZE[0])
   // 画面的分辨率
   const [resolution, setResolution] = useState(RESOLUTION[0])
+  // 生成视频的数量
+  const [videoCount, setVideoCount] = useState(COUNT[0])
 
 
   // 计算分页数据
@@ -87,6 +89,7 @@ const App = () => {
         <div className="flex items-center justify-center gap-8 mt-4 w-full">
           <ListSelect selected={size} setSelected={setSize} data={SIZE} label="尺寸"/>
           <ListSelect selected={resolution} setSelected={setResolution} data={RESOLUTION} label="分辨率"/>
+          <ListSelect selected={videoCount} setSelected={setVideoCount} data={COUNT} label="视频数量"/>
         </div>
         <button 
           onClick={generateVideoHandler}
