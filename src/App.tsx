@@ -34,7 +34,7 @@ const App = () => {
   )
 
   useEffect(() => {
-    const newSocket = new WebSocket("ws://localhost:8765")
+    const newSocket = new WebSocket("ws://101.34.56.79:8765")
 
     newSocket.onopen = () => {
       console.log("Socket opened!")
@@ -70,8 +70,12 @@ const App = () => {
 
   const generateVideoHandler = () => {
     setIsClick(false)
+    console.log(videoCount)
     socket?.send(JSON.stringify({
-      "action": "start"
+      "action": "start",
+      "COUNT": videoCount.name,
+      "SIZE": "16:9",
+      "RESOLUTION": "720P"
     }))
   }
 
@@ -106,7 +110,7 @@ const App = () => {
                 key={item.title}
               >
                 <video controls className="rounded-lg">
-                  <source src="https://fitness-nestjs.oss-cn-shanghai.aliyuncs.com/videos/458_1692544695.mp4" type="video/mp4"/>
+                  <source src={item.url} type="video/mp4"/>
                 </video>
               </div>
             ))

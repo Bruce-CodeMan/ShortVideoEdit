@@ -7,6 +7,7 @@
 // 视频
 export interface IMessage {
   title: string;
+  url: string;
 }
 
 // 页码
